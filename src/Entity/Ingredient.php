@@ -25,9 +25,18 @@ class Ingredient
     #[Assert\LessThan(200)]
     private $price;
 
-    #[ORM\Column(type: 'DateTime_Immutable')]
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Assert\NotNull()]
     private $createdAt;
+
+    /**
+     * Constructor
+     * DateTimeImmutable().
+     */
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
