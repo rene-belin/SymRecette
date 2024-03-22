@@ -213,4 +213,10 @@ class Recipe
 
         return $this;
     }
+
+    // Ajout d'une méthode magique
+    public function __toString()
+    {
+        return $this->name;
+    }
 }
