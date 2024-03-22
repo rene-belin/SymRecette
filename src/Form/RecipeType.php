@@ -6,7 +6,6 @@ use App\Entity\Recipe;
 use App\Entity\Ingredient;
 use App\Repository\IngredientRepository;
 use Symfony\Component\Form\AbstractType;
-use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -75,7 +74,7 @@ class RecipeType extends AbstractType
                     'min' => 1,
                     'max' => 5
                 ],
-                'label' => 'difficulté',
+                'label' => 'Difficulté',
                 'label_attr' => [
                     'class' => 'form-label mt-4'
                 ],
