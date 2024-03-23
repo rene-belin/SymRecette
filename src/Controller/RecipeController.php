@@ -4,12 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Recipe;
 use App\Form\RecipeType;
+use App\Form\IngredientType;
+use Doctrine\ORM\EntityManager;
 use App\Repository\RecipeRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RecipeController extends AbstractController
 {
@@ -32,15 +35,79 @@ class RecipeController extends AbstractController
     }
 
     #[Route('/recette/creation', name: 'recipe.new', methods: ['GET', 'POST'])]
-    public function new(): Response
+    public function new(Request $request, EntityManagerInterface $manager): Response
     {
-        // ajout
+        // Création d'une nouvelle instance de l'entité Recipe
         $recipe = new Recipe();
+
+        // Création du formulaire lié à l'entité Recipe
         $form = $this->createForm(RecipeType::class, $recipe);
-        // ---------
+
+        // Gestion de la requête et hydratation de l'entité avec les données du formulaire
+        $form->handleRequest($request);
+
+        // Vérification si le formulaire a été soumis et est valide
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupération des données du formulaire
+            $recipe = $form->getData();
+
+            // Persistance de l'entité Recipe
+            $manager->persist($recipe);
+
+            // Enregistrement des données dans la base de données
+            $manager->flush();
+
+            // Ajout d'un message flash pour informer de la création réussie
+            $this->addFlash(
+                'success',
+                'Votre recette a été créé avec succès !'
+            );
+
+            // Redirection vers la route qui affiche la liste des recettes
+            return $this->redirectToRoute('recipe.index');
+        }
+
+        // Si le formulaire n'est pas soumis ou n'est pas valide, on affiche le formulaire
         return $this->render('pages/recipe/new.html.twig', [
-            // ajout
             'form' => $form->createView()
+        ]);
+    }
+    /**
+     * Ce controller edit la recette
+     * @param Recipe function
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return response
+     */
+    #[Route('/recette/edition/{id}', name: 'recipe.edit', methods: ['GET', 'POST'])]
+    public function edit(
+        recipe $recipe,
+        Request $request,
+        EntityManagerInterface $manager
+    ): Response {
+        // Création du formulaire
+        $form = $this->createForm(RecipeType::class, $recipe);
+
+        // Traitement du formulaire
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $recipe = $form->getData();
+
+            $manager->persist($recipe); // Demande à Doctrine de gérer l'objet
+            $manager->flush(); // Exécute les requêtes SQL et écrit dans la base de données
+
+            // Message flash correct
+            $this->addFlash(
+                'success', // Utilisez 'success' comme type de message flash
+                'Votre recette a été modifiée avec succès !'
+            );
+
+            // Redirection vers la page de l'index des ingrédients après la création
+            return $this->redirectToRoute('recipe.index');
+        }
+
+        return $this->render('pages/recipe/edit.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 }

@@ -59,6 +59,7 @@ class RecipeType extends AbstractType
                     'min' => 1,
                     'max' => 50
                 ],
+                'required' => false,
                 'label' => 'Nombre de personnes',
                 'label_attr' => [
                     'class' => 'form-label mt-4'
@@ -74,6 +75,7 @@ class RecipeType extends AbstractType
                     'min' => 1,
                     'max' => 5
                 ],
+                'required' => false,
                 'label' => 'Difficulté',
                 'label_attr' => [
                     'class' => 'form-label mt-4'
@@ -101,6 +103,7 @@ class RecipeType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                 ],
+                'required' => false,
                 'label' => 'Prix ',
                 'label_attr' => [
                     'class' => 'form-label mt-4',
@@ -114,6 +117,7 @@ class RecipeType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                 ],
+                'required' => false,
                 'label' => 'Favoris ? ',
                 'label_attr' => [
                     'class' => 'form-label mt-4',
