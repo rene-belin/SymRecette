@@ -17,11 +17,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class RecipeController extends AbstractController
 {
     /**
-     * recipe.
+     * le Controller affiche toutes les recettes
+     * @param RecipeRepository $recipeRepo
+     * @param PaginatorInterface $paginator
+     * @param Request $request
+     * @return request
      */
     #[Route('/recette', name: 'recipe.index', methods: ['GET'])]
-    public function index(RecipeRepository $recipeRepo, PaginatorInterface $paginator, Request $request): Response
-    {
+    public function index(
+        RecipeRepository $recipeRepo,
+        PaginatorInterface $paginator,
+        Request $request
+    ): Response {
         // Utilisation du Paginator pour paginer les résultats de la requête
         $recipes = $paginator->paginate(
             $recipeRepo->findAll(), // Requête pour obtenir toutes les recettes
@@ -33,10 +40,18 @@ class RecipeController extends AbstractController
             'recipes' => $recipes, // Passez la variable, pas une chaîne
         ]);
     }
-
+    /**
+     * Ce contrôleur nous permet de créer une nouvelle recette
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return Response
+     */
     #[Route('/recette/creation', name: 'recipe.new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $manager): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $manager
+    ): Response {
         // Création d'une nouvelle instance de l'entité Recipe
         $recipe = new Recipe();
 
@@ -73,8 +88,8 @@ class RecipeController extends AbstractController
         ]);
     }
     /**
-     * Ce controller edit la recette
-     * @param Recipe function
+     * Ce contrôleur nous permet d'éditer une recette
+     * @param Recipe $recipe
      * @param Request $request
      * @param EntityManagerInterface $manager
      * @return response
@@ -91,6 +106,7 @@ class RecipeController extends AbstractController
         // Traitement du formulaire
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            // récupère les données qui ont été soumises et mappées aux champs du formulaire
             $recipe = $form->getData();
 
             $manager->persist($recipe); // Demande à Doctrine de gérer l'objet
@@ -109,5 +125,27 @@ class RecipeController extends AbstractController
         return $this->render('pages/recipe/edit.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+    /**
+     * Ce contrôleur nous permet de supprimer une recette
+     * 
+     * @param EntityManagerInterface $manager
+     * @param Recipe $recipe
+     * @return Response
+     */
+    #[Route('/recette/suppression/{id}', 'recipe.delete', methods: ['GET'])]
+    public function delete(
+        EntityManagerInterface $manager,
+        Recipe $recipe
+    ): Response {
+        $manager->remove($recipe);
+        $manager->flush();
+
+        $this->addFlash(
+            'success',
+            'Votre recette a été supprimé avec succès !'
+        );
+
+        return $this->redirectToRoute('recipe.index');
     }
 }

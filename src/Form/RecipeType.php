@@ -44,6 +44,7 @@ class RecipeType extends AbstractType
                     'min' => 1,
                     'max' => 1440
                 ],
+            'required' => false,
                 'label' => 'Temps (en minutes)',
                 'label_attr' => [
                     'class' => 'form-label mt-4'
@@ -91,7 +92,7 @@ class RecipeType extends AbstractType
                     'min' => 1,
                     'max' => 5
                 ],
-                'label' => 'description',
+                'label' => 'Description',
                 'label_attr' => [
                     'class' => 'form-label mt-4'
                 ],
@@ -115,15 +116,17 @@ class RecipeType extends AbstractType
             ])
             ->add('isFavorite', CheckboxType::class, [
                 'attr' => [
-                    'class' => 'form-control',
+                    // code Bootswatch
+                    'class' => 'form-check-input',
                 ],
                 'required' => false,
                 'label' => 'Favoris ? ',
                 'label_attr' => [
-                    'class' => 'form-label mt-4',
+                    // code Bootswatch
+                    'class' => 'form-check-label',
                 ],
                 'constraints' => [
-                    new Assert\NotNull(),
+                    new Assert\NotNull()
 
                 ],
             ])
@@ -135,7 +138,7 @@ class RecipeType extends AbstractType
                 },
                 'label' => 'Les ingrédients',
                 'label_attr' => [
-                    'class' => 'form-label mt-4',
+                    'class' => 'form-label mt-4'
                 ],
                 'choice_label' => 'name',
                 'multiple' => true,
@@ -143,9 +146,9 @@ class RecipeType extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'btn btn-primary mt-4',
+                    'class' => 'btn btn-primary mt-4'
                 ],
-                'label' => 'créer ma recette',
+                'label' => 'Créer ma recette'
             ]);
     }
 

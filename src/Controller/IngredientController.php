@@ -33,8 +33,11 @@ class IngredientController extends AbstractController
     // Cette méthode affiche la liste des ingrédients avec pagination.
     // Injection de dépendance pour accéder au repository des ingrédients
     // et au service de pagination.
-    public function index(IngredientRepository $ingredientRepo, PaginatorInterface $paginator, Request $request): Response
-    {
+    public function index(
+        IngredientRepository $ingredientRepo,
+        PaginatorInterface $paginator,
+        Request $request
+    ): Response {
         // Utilisation du Paginator pour paginer les résultats de la requête
         $ingredients = $paginator->paginate(
             $ingredientRepo->findAll(), // Requête pour obtenir tous les ingrédients
@@ -63,8 +66,9 @@ class IngredientController extends AbstractController
      * @return Response A Response instance containing the rendered view or a redirect
      */
     #[Route('/ingredient/nouveau', 'ingredient.new')]
-    public function new(Request $request, EntityManagerInterface $manager): Response
-    {
+    public function new(Request $request,
+     EntityManagerInterface $manager
+     ): Response  {
         // Création du formulaire
         $ingredient = new Ingredient();
         $form = $this->createForm(IngredientType::class, $ingredient);
@@ -108,8 +112,11 @@ class IngredientController extends AbstractController
      */
 
     #[Route('/ingredient/edition/{id}', name: 'ingredient.edit', methods: ['GET', 'POST'])]
-    public function edit(Ingredient $ingredient, Request $request, EntityManagerInterface $manager): Response
-    {
+    public function edit(
+        Ingredient $ingredient,
+         Request $request,
+          EntityManagerInterface $manager
+          ): Response  {
         // Création du formulaire
         $form = $this->createForm(IngredientType::class, $ingredient);
         // Traitement du formulaire
@@ -136,7 +143,7 @@ class IngredientController extends AbstractController
     }
 
     /**
-     * This controller allows us to delete an ingredient.
+     * Ce contrôleur nous permet de supprimer une recette
      */
     #[Route('/ingredient/suppression/{id}', 'ingredient.delete', methods: ['GET'])]
     public function delete(
