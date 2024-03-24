@@ -28,7 +28,7 @@ class RegistrationType extends AbstractType
                 ],
                 'label' => 'Nom / Prénom', // Libellé affiché pour le champ
                 'label_attr' => [
-                    'class' => 'form_label' // Classe CSS pour styliser le libellé
+                    'class' => 'form_label mt-4' // Classe CSS pour styliser le libellé
                 ],
                 'constraints' => [
                     new Assert\NotBlank(), // Le champ ne doit pas être vide
@@ -43,7 +43,7 @@ class RegistrationType extends AbstractType
                 ],
                 'label' => 'Pseudo (facultatif)',
                 'label_attr' => [
-                    'class' => 'form-label'
+                    'class' => 'form-label mt-4'
                 ],
                 'constraints' => [
                     new Assert\Length(['min' => 2, 'max' => 50]),
@@ -57,7 +57,7 @@ class RegistrationType extends AbstractType
                 ],
                 'label' => 'Adresse email',
                 'label_attr' => [
-                    'class' => 'form-label'
+                    'class' => 'form-label mt-4'
                 ],
                 'constraints' => [
                     new Assert\NotBlank(),
@@ -65,20 +65,32 @@ class RegistrationType extends AbstractType
                     new Assert\Length(['min' => 2, 'max' => 180]),
                 ]
             ])
-            ->add('password', RepeatedType::class, [
+            ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'first_options' => [
+                    'attr' => [
+                        'class' => 'form-control'
+                    ],
                     'label' => 'Mot de passe',
+                    'label_attr' => [
+                        'class' => 'form-label mt-4'
+                    ]
                 ],
                 'second_options' => [
-                    'label' => 'Confirmation du mot de passe'
+                    'attr' => [
+                        'class' => 'form-control'
+                    ],
+                    'label' => 'Confirmation du mot de passe',
+                    'label_attr' => [
+                        'class' => 'form-label mt-4'
+                    ]
                 ],
-                'invalide_message'=>'Les mots de passe ne correspondent pas.'
+                'invalid_message' => 'Les mots de passe ne correspondent pas.',
             ])
             // Ajout d'un bouton
-            ->add('submit', SubmitType::class,[
-                'attr'=>[
-                    'class'=>'btn btn-primary'
+            ->add('submit', SubmitType::class, [
+                'attr' => [
+                    'class' => 'btn btn-primary mt-4'
                 ]
             ]);
     }

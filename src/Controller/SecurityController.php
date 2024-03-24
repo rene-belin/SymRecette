@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\RegistrationType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,9 +28,16 @@ class SecurityController extends AbstractController
         // nothing to do here...
     }
 
+    // Registration
     #[Route('/inscription', 'security.registration', methods: ['GET', 'POST'])]
     public function registration(): Response
     {
-        return $this->render('pages/security/registration.html.twig');
+        // Définir le formulaire
+        $user = new User();
+        $form = $this->createForm(RegistrationType::class, $user);
+
+        return $this->render('pages/security/registration.html.twig',[
+            'form'=>$form->createView()
+        ]);
     }
 }
