@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserPasswordType;
 use App\Form\UserType;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -72,6 +74,59 @@ class UserController extends AbstractController
         // Affichage de la vue avec le formulaire d'édition de l'utilisateur
         return $this->render('pages/user/edit.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * Ce controller permet de modifier le mot de passe
+     *
+     * @param User $user
+     * @param Request $request
+     * @param UserPasswordHasherInterface $hasher
+     * @return Response
+     */
+    #[Route('/utilisateur/edition-mot-de-passe/{id}', name: 'user.edit.password', methods: ['GET', 'POST'])]
+    public function editPassword(
+        User $user,
+        Request $request,
+        UserPasswordHasherInterface $hasher,
+        EntityManagerInterface $manager
+    ): Response {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('security.login');
+        }
+        if (!$this->getUser() !== $user) {
+            return $this->redirectToRoute('recipe.index');
+        }
+
+        $form = $this->createForm(UserPasswordtype::class);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($hasher->isPasswordValid($user, $form->getData()['plainPassword'])) {
+                $user->setPassword(
+                    $hasher->hashPassword($user, $form->getData()['newPassword'])
+                );
+                $manager->persist($user);
+                $manager->flush();
+
+                // Message flash de succès
+                $this->addFlash(
+                    'success',
+                    'Le mot de passe a été modifié avec succès.'
+                );
+                return $this->redirectToRoute('recipe.index');
+            } else {
+                // Message flash d'avertissement si le mot de passe est incorrect
+                $this->addFlash(
+                    'warning',
+                    'Le mot de passe saisi est incorrect. Veuillez réessayer.'
+                );
+            }
+        }
+
+        return $this->render('pages/user/edit_password.html.twig', [
+            'form' => $form->createView()
         ]);
     }
 }

@@ -37,18 +37,18 @@ class UserListener
         $this->encodePassword($user);
     }
 
-    /**
-     * Écouteur d'événement preUpdate.
-     *
-     * Cette méthode est appelée avant qu'une entité User soit mise à jour.
-     * Elle encode le mot de passe de l'utilisateur s'il a été modifié.
-     *
-     * @param User $user L'entité User qui va être mise à jour.
-     */
-    public function preUpdate(User $user)
-    {
-        $this->encodePassword($user);
-    }
+    // /**
+    //  * Écouteur d'événement preUpdate.
+    //  *
+    //  * Cette méthode est appelée avant qu'une entité User soit mise à jour.
+    //  * Elle encode le mot de passe de l'utilisateur s'il a été modifié.
+    //  *
+    //  * @param User $user L'entité User qui va être mise à jour.
+    //  */
+    // public function preUpdate(User $user)
+    // {
+    //     $this->encodePassword($user);
+    // }
 
     /**
      * Encode le mot de passe en se basant sur le mot de passe en clair.
