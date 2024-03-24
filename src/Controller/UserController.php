@@ -92,21 +92,30 @@ class UserController extends AbstractController
         UserPasswordHasherInterface $hasher,
         EntityManagerInterface $manager
     ): Response {
+        // Vérifie si un utilisateur est connecté
         if (!$this->getUser()) {
+            // Redirection vers la page de connexion si aucun utilisateur n'est connecté
             return $this->redirectToRoute('security.login');
         }
-        if (!$this->getUser() !== $user) {
+
+        // Vérifie si l'utilisateur connecté est différent de celui qu'on tente d'éditer
+        if ($this->getUser() !== $user) {
+            // Redirection vers l'index des recettes si l'utilisateur n'est pas autorisé à éditer ce profil
             return $this->redirectToRoute('recipe.index');
         }
 
-        $form = $this->createForm(UserPasswordtype::class);
+        // Création du formulaire pour modifier le mot de passe de l'utilisateur
+        $form = $this->createForm(UserPasswordType::class);
 
+        // Traitement de la requête HTTP et soumission du formulaire
         $form->handleRequest($request);
+
+        // Vérification de la soumission et de la validité du formulaire
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérification de la validité du mot de passe
             if ($hasher->isPasswordValid($user, $form->getData()['plainPassword'])) {
-                $user->setPassword(
-                    $hasher->hashPassword($user, $form->getData()['newPassword'])
-                );
+                // Hashage et enregistrement du nouveau mot de passe dans la base de données
+                $user->setPassword($hasher->hashPassword($user, $form->getData()['newPassword']));
                 $manager->persist($user);
                 $manager->flush();
 
@@ -115,6 +124,7 @@ class UserController extends AbstractController
                     'success',
                     'Le mot de passe a été modifié avec succès.'
                 );
+                // Redirection vers l'index des recettes
                 return $this->redirectToRoute('recipe.index');
             } else {
                 // Message flash d'avertissement si le mot de passe est incorrect
@@ -125,8 +135,10 @@ class UserController extends AbstractController
             }
         }
 
+        // Affichage du formulaire dans la vue
         return $this->render('pages/user/edit_password.html.twig', [
             'form' => $form->createView()
         ]);
     }
+
 }
