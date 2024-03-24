@@ -15,7 +15,7 @@ class SecurityController extends AbstractController
     {
         return $this->render('pages/security/login.html.twig', [
             'last_username' => $authenticationUtils->getLastUsername(),
-            'error'=>$authenticationUtils->getLastAuthenticationError()
+            'error' => $authenticationUtils->getLastAuthenticationError()
         ]);
     }
 
@@ -24,5 +24,11 @@ class SecurityController extends AbstractController
     public function logout()
     {
         // nothing to do here...
+    }
+
+    #[Route('/inscription', 'security.registration', methods: ['GET', 'POST'])]
+    public function registration(): Response
+    {
+        return $this->render('pages/security/registration.html.twig');
     }
 }
