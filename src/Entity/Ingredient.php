@@ -31,7 +31,7 @@ class Ingredient
     #[Assert\NotNull()]
     private $createdAt;
 
-    #[ORM\ManyToOne(inversedBy: 'ingredients')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'ingredients')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
@@ -54,7 +54,7 @@ class Ingredient
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -66,7 +66,7 @@ class Ingredient
         return $this->price;
     }
 
-    public function setPrice(float $price): static
+    public function setPrice(float $price): self
     {
         $this->price = $price;
 
@@ -78,7 +78,7 @@ class Ingredient
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
@@ -95,7 +95,7 @@ class Ingredient
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 

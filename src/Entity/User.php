@@ -40,7 +40,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var list<string> The user roles
      */
-    #[ORM\Column]
+    #[ORM\Column(type: 'json')]
     #[Assert\NotNull()]
     private array $roles = [];
 
@@ -53,8 +53,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank()]
     private ?string $password = 'password';
 
-    
-    #[ORM\Column]
+
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Assert\NotNull()]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -77,7 +77,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->fullname;
     }
 
-    public function setFullname(string $fullname): static
+    public function setFullname(string $fullname): self
     {
         $this->fullname = $fullname;
 
@@ -89,7 +89,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->pseudo;
     }
 
-    public function setPseudo(?string $pseudo): static
+    public function setPseudo(?string $pseudo): self
     {
         $this->pseudo = $pseudo;
 

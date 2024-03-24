@@ -13,12 +13,27 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+
+        //  Users
+        $users = [];
+        for ($i = 0; $i < 10; $i++) {
+            $user = new User();
+            $user->setFullName('User' . ($i + 1))
+                ->setPseudo(mt_rand(0, 1) === 1 ? 'Pseudo' . ($i + 1) : null)
+                ->setEmail('user' . ($i + 1) . '@example.com')
+                ->setRoles(['ROLE_USER'])
+                // Définissez également le mot de passe en clair pour les utilisateurs réguliers
+                ->setPlainPassword('password');
+            $users[] = $user;
+            $manager->persist($user);
+        }
         // Ingredients
         $ingredients = [];
         for ($i = 0; $i < 50; ++$i) {
             $ingredient = new Ingredient();
             $ingredient->setName('Ingredient ' . ($i + 1))
-                ->setPrice(mt_rand(0, 100));
+                ->setPrice(mt_rand(0, 100))
+                ->setUser($users[mt_rand(0, count($users) - 1)]);
             $ingredients[] = $ingredient;
             $manager->persist($ingredient);
         }
@@ -49,18 +64,6 @@ class AppFixtures extends Fixture
 
         $manager->persist($admin);
 
-        // Regular Users
-        for ($i = 0; $i < 10; $i++) {
-            $user = new User();
-            $user->setFullName('User' . ($i + 1))
-                ->setPseudo(mt_rand(0, 1) === 1 ? 'Pseudo' . ($i + 1) : null)
-                ->setEmail('user' . ($i + 1) . '@example.com')
-                ->setRoles(['ROLE_USER'])
-                // Définissez également le mot de passe en clair pour les utilisateurs réguliers
-                ->setPlainPassword('password');
-
-            $manager->persist($user);
-        }
         $manager->flush();
     }
 }
