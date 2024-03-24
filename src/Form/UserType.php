@@ -11,6 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class UserType extends AbstractType
 {
@@ -47,12 +48,22 @@ class UserType extends AbstractType
                     new Assert\Length(['min' => 2, 'max' => 50]),
                 ]
             ])
-
+            ->add('plainPassword', PasswordType::class, [
+                'attr'=>[
+                    'class'=>'form-control'
+                ],
+                'label'=>'Mot de passe',
+                'label_attr'=>[
+                    'class'=>'form-label mt-4'
+                ]
+            
+            ])
             // Ajout d'un bouton
             ->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'btn btn-primary mt-4'
-                ]
+            ],
+            'label' => 'Modifier'
             ]);
     }
 

@@ -9,61 +9,67 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends AbstractController
 {
-    // Définition de la route pour l'édition d'un utilisateur avec son ID dans l'URL
-
-    /**
-     * Ce controller permet d'éditer le profil utilisateur
-     *
-     * @param User $user
-     * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @return Response
-     */
+    // Route pour l'édition du profil utilisateur
     #[Route('/utilisateur/edition/{id}', name: 'user.edit', methods: ['GET', 'POST'])]
-    public function edit(User $user, Request $request, EntityManagerInterface $manager): Response
-    {
+    public function edit(
+        User $user,
+        Request $request,
+        EntityManagerInterface $manager,
+        UserPasswordHasherInterface $hasher
+    ): Response {
         // Vérifie si un utilisateur est connecté
         if (!$this->getUser()) {
-            // Si aucun utilisateur n'est connecté, redirige vers la page de connexion
+            // Redirection vers la page de connexion si aucun utilisateur n'est connecté
             return $this->redirectToRoute('security.login');
         }
 
         // Vérifie si l'utilisateur connecté est différent de celui qu'on tente d'éditer
         if ($this->getUser() !== $user) {
-            // Si c'est le cas, redirige vers l'index des recettes
+            // Redirection vers l'index des recettes si l'utilisateur n'est pas autorisé à éditer ce profil
             return $this->redirectToRoute('recipe.index');
         }
 
-        // Crée le formulaire pour éditer l'utilisateur
+        // Création du formulaire pour éditer l'utilisateur
         $form = $this->createForm(UserType::class, $user);
-
-        // Gère la requête et soumet le formulaire
+        // Traitement de la requête HTTP et soumission du formulaire
         $form->handleRequest($request);
 
-        // Vérifie si le formulaire a été soumis et est valide
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Récupère les données du formulaire
-            $user = $form->getData();
+        // Vérification de la soumission et de la validité du formulaire
+        if ($form->isSubmitted()) {
+            // Récupération du mot de passe en clair depuis le formulaire
+            $plainPassword = $form->get('plainPassword')->getData();
 
-            // Persiste les données de l'utilisateur dans la base de données
-            $manager->persist($user);
-            // Applique les changements dans la base de données
-            $manager->flush();
+            // Vérification de la validité du mot de passe
+            if ($hasher->isPasswordValid($user, $plainPassword)) {
+                // Vérification de la validité des autres champs du formulaire
+                if ($form->isValid()) {
+                    // Enregistrement des modifications de l'utilisateur dans la base de données
+                    $manager->persist($user);
+                    $manager->flush();
 
-            // Ajoute un message flash de succès
-            $this->addFlash(
-                'success',
-                'Les informations de votre compte ont bien été modifiées.'
-            );
+                    // Message flash de succès
+                    $this->addFlash(
+                        'success',
+                        'Les informations de votre compte ont bien été modifiées.'
+                    );
 
-            // Redirige vers l'index des recettes
-            return $this->redirectToRoute('recipe.index');
+                    // Redirection vers l'index des recettes
+                    return $this->redirectToRoute('recipe.index');
+                }
+            } else {
+                // Message flash d'avertissement si le mot de passe est incorrect
+                $this->addFlash(
+                    'warning',
+                    'Le mot de passe saisi est incorrect. Veuillez réessayer.'
+                );
+            }
         }
 
-        // Rend la vue avec le formulaire pour éditer l'utilisateur
+        // Affichage de la vue avec le formulaire d'édition de l'utilisateur
         return $this->render('pages/user/edit.html.twig', [
             'form' => $form->createView(),
         ]);
