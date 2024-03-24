@@ -40,7 +40,10 @@ class IngredientController extends AbstractController
     ): Response {
         // Utilisation du Paginator pour paginer les résultats de la requête
         $ingredients = $paginator->paginate(
-            $ingredientRepo->findAll(), // Requête pour obtenir tous les ingrédients
+
+            // Récupérer les ingrédients associés à l'utilisateur connecté
+            $ingredientRepo->findBy(['user'=>$this->getUser()]),
+
             $request->query->getInt('page', 1), // Numéro de la page actuelle
             10 // Nombre d'ingrédients par page
         );
@@ -65,7 +68,8 @@ class IngredientController extends AbstractController
      *
      * @return Response A Response instance containing the rendered view or a redirect
      */
-    #[Route('/ingredient/nouveau', 'ingredient.new')]
+    #[Route('/ingredient/nouveau', name: 'ingredient.new', methods: ['GET', 'POST'])]
+
     public function new(Request $request,
      EntityManagerInterface $manager
      ): Response  {
@@ -77,6 +81,9 @@ class IngredientController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $ingredient = $form->getData();
+
+            // Lier un ingredient relié à un utilisateur une fois connecté
+            $ingredient->setUser($this->getUser());
 
             $manager->persist($ingredient); // Demande à Doctrine de gérer l'objet
             $manager->flush(); // Exécute les requêtes SQL et écrit dans la base de données
@@ -145,7 +152,8 @@ class IngredientController extends AbstractController
     /**
      * Ce contrôleur nous permet de supprimer une recette
      */
-    #[Route('/ingredient/suppression/{id}', 'ingredient.delete', methods: ['GET'])]
+    #[Route('/ingredient/suppression/{id}', name: 'ingredient.delete', methods: ['GET'])]
+
     public function delete(
         EntityManagerInterface $manager,
         Ingredient $ingredient

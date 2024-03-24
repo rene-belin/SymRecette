@@ -27,13 +27,20 @@ class AppFixtures extends Fixture
             $users[] = $user;
             $manager->persist($user);
         }
-        // Ingredients
+        // Ingrédients
         $ingredients = [];
         for ($i = 0; $i < 50; ++$i) {
             $ingredient = new Ingredient();
             $ingredient->setName('Ingredient ' . ($i + 1))
-                ->setPrice(mt_rand(0, 100))
-                ->setUser($users[mt_rand(0, count($users) - 1)]);
+                ->setPrice(mt_rand(0, 100));
+
+            // Obtenez un utilisateur aléatoire et assurez-vous qu'il n'est pas null
+            $randomUser = $users[mt_rand(0, count($users) - 1)];
+            if (null === $randomUser) {
+                throw new \LogicException('Random User should not be null.');
+            }
+            $ingredient->setUser($randomUser);
+
             $ingredients[] = $ingredient;
             $manager->persist($ingredient);
         }

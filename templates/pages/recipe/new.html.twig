@@ -8,6 +8,12 @@
 		<h1 class="mt-4">Création d'une recette</h1>
 		{{ form_start(form) }}
 
+					{% for message in app.flashes('success') %}
+					<div class="alert alert-success mt-4">
+						{{ message }}
+					</div>
+					{% endfor %}
+
 		<div class="form-group">
 			{{ form_label(form.name) }}
 			{{ form_widget(form.name) }}
