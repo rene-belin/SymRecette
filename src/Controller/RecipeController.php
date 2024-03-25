@@ -9,9 +9,11 @@ use Doctrine\ORM\EntityManager;
 use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RecipeController extends AbstractController
@@ -23,7 +25,10 @@ class RecipeController extends AbstractController
      * @param Request $request
      * @return request
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/recette', name: 'recipe.index', methods: ['GET'])]
+
+
     public function index(
         RecipeRepository $recipeRepo,
         PaginatorInterface $paginator,
@@ -47,6 +52,7 @@ class RecipeController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return Response
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/recette/creation', name: 'recipe.new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
@@ -94,6 +100,9 @@ class RecipeController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return response
      */
+
+    // La fonction is_granted, qui est utilisée pour vérifier si l'utilisateur actuellement connecté possède un certain rôle.
+    #[Security("is_granted('ROLE_USER') and user === recipe.getUser()")]
     #[Route('/recette/edition/{id}', name: 'recipe.edit', methods: ['GET', 'POST'])]
     public function edit(
         recipe $recipe,

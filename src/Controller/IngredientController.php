@@ -7,10 +7,12 @@ use App\Form\IngredientType;
 use App\Repository\IngredientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class IngredientController extends AbstractController
 {
@@ -29,7 +31,11 @@ class IngredientController extends AbstractController
      *
      * @return Response A Response instance containing the rendered view
      */
+    //L'annotation "IsGranted" est le moyen le plus simple de restreindre l'accès
+    #[IsGranted("ROLE_USER")]
     #[Route('/ingredient', name: 'ingredient.index', methods: ['GET'])]
+
+    
     // Cette méthode affiche la liste des ingrédients avec pagination.
     // Injection de dépendance pour accéder au repository des ingrédients
     // et au service de pagination.
@@ -68,7 +74,10 @@ class IngredientController extends AbstractController
      *
      * @return Response A Response instance containing the rendered view or a redirect
      */
+    #[IsGranted("ROLE_USER")]
     #[Route('/ingredient/nouveau', name: 'ingredient.new', methods: ['GET', 'POST'])]
+
+    //L'annotation "IsGranted" est le moyen le plus simple de restreindre l'accès
 
     public function new(Request $request,
      EntityManagerInterface $manager
@@ -118,6 +127,8 @@ class IngredientController extends AbstractController
      * @return Response A Response instance containing the rendered view
      */
 
+    // La fonction is_granted, qui est utilisée pour vérifier si l'utilisateur actuellement connecté possède un certain rôle.
+    #[Security("is_granted('ROLE_USER') and user === ingredient.getUser()")]
     #[Route('/ingredient/edition/{id}', name: 'ingredient.edit', methods: ['GET', 'POST'])]
     public function edit(
         Ingredient $ingredient,

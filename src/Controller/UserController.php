@@ -3,40 +3,30 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\UserPasswordType;
 use App\Form\UserType;
-use Doctrine\ORM\EntityManager;
+use App\Form\UserPasswordType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends AbstractController
 {
+    #[Security("is_granted('ROLE_USER') and user === choosenUser")]
     // Route pour l'édition du profil utilisateur
     #[Route('/utilisateur/edition/{id}', name: 'user.edit', methods: ['GET', 'POST'])]
     public function edit(
-        User $user,
+        User $choosenUser,
         Request $request,
         EntityManagerInterface $manager,
         UserPasswordHasherInterface $hasher
     ): Response {
-        // Vérifie si un utilisateur est connecté
-        if (!$this->getUser()) {
-            // Redirection vers la page de connexion si aucun utilisateur n'est connecté
-            return $this->redirectToRoute('security.login');
-        }
-
-        // Vérifie si l'utilisateur connecté est différent de celui qu'on tente d'éditer
-        if ($this->getUser() !== $user) {
-            // Redirection vers l'index des recettes si l'utilisateur n'est pas autorisé à éditer ce profil
-            return $this->redirectToRoute('recipe.index');
-        }
 
         // Création du formulaire pour éditer l'utilisateur
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $choosenUser);
         // Traitement de la requête HTTP et soumission du formulaire
         $form->handleRequest($request);
 
@@ -46,11 +36,11 @@ class UserController extends AbstractController
             $plainPassword = $form->get('plainPassword')->getData();
 
             // Vérification de la validité du mot de passe
-            if ($hasher->isPasswordValid($user, $plainPassword)) {
+            if ($hasher->isPasswordValid($choosenUser, $plainPassword)) {
                 // Vérification de la validité des autres champs du formulaire
                 if ($form->isValid()) {
                     // Enregistrement des modifications de l'utilisateur dans la base de données
-                    $manager->persist($user);
+                    $manager->persist($choosenUser);
                     $manager->flush();
 
                     // Message flash de succès
@@ -85,24 +75,14 @@ class UserController extends AbstractController
      * @param UserPasswordHasherInterface $hasher
      * @return Response
      */
+    #[Security("is_granted('ROLE_USER') and user === choosenUser")]
     #[Route('/utilisateur/edition-mot-de-passe/{id}', name: 'user.edit.password', methods: ['GET', 'POST'])]
     public function editPassword(
-        User $user,
+        User $choosenUser,
         Request $request,
         UserPasswordHasherInterface $hasher,
         EntityManagerInterface $manager
     ): Response {
-        // Vérifie si un utilisateur est connecté
-        if (!$this->getUser()) {
-            // Redirection vers la page de connexion si aucun utilisateur n'est connecté
-            return $this->redirectToRoute('security.login');
-        }
-
-        // Vérifie si l'utilisateur connecté est différent de celui qu'on tente d'éditer
-        if ($this->getUser() !== $user) {
-            // Redirection vers l'index des recettes si l'utilisateur n'est pas autorisé à éditer ce profil
-            return $this->redirectToRoute('recipe.index');
-        }
 
         // Création du formulaire pour modifier le mot de passe de l'utilisateur
         $form = $this->createForm(UserPasswordType::class);
@@ -113,10 +93,10 @@ class UserController extends AbstractController
         // Vérification de la soumission et de la validité du formulaire
         if ($form->isSubmitted() && $form->isValid()) {
             // Vérification de la validité du mot de passe
-            if ($hasher->isPasswordValid($user, $form->getData()['plainPassword'])) {
+            if ($hasher->isPasswordValid($choosenUser, $form->getData()['plainPassword'])) {
                 // Hashage et enregistrement du nouveau mot de passe dans la base de données
-                $user->setPassword($hasher->hashPassword($user, $form->getData()['newPassword']));
-                $manager->persist($user);
+                $choosenUser->setPassword($hasher->hashPassword($choosenUser, $form->getData()['newPassword']));
+                $manager->persist($choosenUser);
                 $manager->flush();
 
                 // Message flash de succès
@@ -140,5 +120,4 @@ class UserController extends AbstractController
             'form' => $form->createView()
         ]);
     }
-
 }

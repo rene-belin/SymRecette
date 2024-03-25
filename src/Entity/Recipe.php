@@ -63,6 +63,11 @@ class Recipe
     #[ORM\ManyToMany(targetEntity: Ingredient::class)]
     private Collection $ingredients;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'recipes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $user;
+
+
     public function __construct()
     {
         $this->ingredients = new ArrayCollection();
@@ -87,7 +92,7 @@ class Recipe
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -99,7 +104,7 @@ class Recipe
         return $this->time;
     }
 
-    public function setTime(?int $time): static
+    public function setTime(?int $time): self
     {
         $this->time = $time;
 
@@ -111,7 +116,7 @@ class Recipe
         return $this->nbPeople;
     }
 
-    public function setNbPeople(?int $nbPeople): static
+    public function setNbPeople(?int $nbPeople): self
     {
         $this->nbPeople = $nbPeople;
 
@@ -123,7 +128,7 @@ class Recipe
         return $this->difficulty;
     }
 
-    public function setDifficulty(?int $difficulty): static
+    public function setDifficulty(?int $difficulty): self
     {
         $this->difficulty = $difficulty;
 
@@ -135,7 +140,7 @@ class Recipe
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
@@ -147,7 +152,7 @@ class Recipe
         return $this->price;
     }
 
-    public function setPrice(?float $price): static
+    public function setPrice(?float $price): self
     {
         $this->price = $price;
 
@@ -159,7 +164,7 @@ class Recipe
         return $this->isFavorite;
     }
 
-    public function setIsFavorite(bool $isFavorite): static
+    public function setIsFavorite(bool $isFavorite): self
     {
         $this->isFavorite = $isFavorite;
 
@@ -171,7 +176,7 @@ class Recipe
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
@@ -183,7 +188,7 @@ class Recipe
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -198,7 +203,7 @@ class Recipe
         return $this->ingredients;
     }
 
-    public function addIngredient(Ingredient $ingredient): static
+    public function addIngredient(Ingredient $ingredient): self
     {
         if (!$this->ingredients->contains($ingredient)) {
             $this->ingredients->add($ingredient);
@@ -207,7 +212,7 @@ class Recipe
         return $this;
     }
 
-    public function removeIngredient(Ingredient $ingredient): static
+    public function removeIngredient(Ingredient $ingredient): self
     {
         $this->ingredients->removeElement($ingredient);
 
@@ -218,5 +223,17 @@ class Recipe
     public function __toString()
     {
         return $this->name;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }
